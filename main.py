@@ -185,3 +185,49 @@ class BisectionCalculator(QWidget):
             fxr = f(xr)
 
             data.append([i, a, b, fa, f(b), xr, fxr, fxr * fa, abs(b - a)])
+
+            if abs(b - a) < e:
+                break
+
+            if fa * fxr < 0:
+                b = xr
+            else:
+                a = xr
+            i += 1
+        
+        if not data:
+            raise RuntimeError("Perhitungan tidak menghasilkan data.")
+            
+        return data
+
+    def _populate_table(self, data):
+        """Mengisi QTableWidget dengan data hasil perhitungan."""
+        self.table.setRowCount(len(data))
+        for row_idx, row_data in enumerate(data):
+            for col_idx, value in enumerate(row_data):
+                item_text = f"{value:.6f}" if isinstance(value, float) else str(value)
+                self.table.setItem(row_idx, col_idx, QTableWidgetItem(item_text))
+    
+    def _show_final_result(self, data, e):
+        """Menampilkan QMessageBox dengan hasil akhir."""
+        last_iteration = data[-1]
+        iterasi, _, _, _, _, akar, fx, _, error_akhir = last_iteration
+
+        if error_akhir < e:
+            QMessageBox.information(self, "Hasil", 
+                f"Solusi ditemukan pada iterasi ke-{iterasi}.\n"
+                f"Akar hampiran x = {akar:.6f} dengan f(x) = {fx:.6f}")
+        else:
+            QMessageBox.warning(self, "Hasil", 
+                f"Solusi tidak konvergen.\nHasil terbaik pada iterasi terakhir: "
+                f"x = {akar:.6f} dengan f(x) = {fx:.6f}")
+
+def main():
+    """Fungsi utama untuk menjalankan aplikasi."""
+    app = QApplication(sys.argv)
+    window = BisectionCalculator()
+    window.show()
+    sys.exit(app.exec_())
+
+if __name__ == '__main__':
+    main()
