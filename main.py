@@ -139,3 +139,49 @@ class BisectionCalculator(QWidget):
         """
         try:
             # 1. Mengambil dan memvalidasi input
+            fungsi_str = self.input_pers.text()
+            a = float(self.input_a.text())
+            b = float(self.input_b.text())
+            e = float(self.input_tolerance.text())
+            n = int(self.input_iterasi.text())
+
+            if not fungsi_str:
+                raise ValueError("Persamaan tidak boleh kosong.")
+
+            # 2. Mem-parsing fungsi
+            x = symbols('x')
+            rumus = sympify(fungsi_str.replace('^', '**'))
+            f = lambda val: float(rumus.subs(x, val))
+
+            # 3. Menjalankan algoritma biseksi
+            data = self._perform_bisection(f, a, b, e, n)
+            
+            # 4. Menampilkan data ke tabel
+            self._populate_table(data)
+            
+            # 5. Menampilkan pesan hasil akhir
+            self._show_final_result(data, e)
+
+        except (ValueError, TypeError) as ve:
+            QMessageBox.critical(self, "Input Error", f"Terjadi kesalahan pada input: {ve}")
+        except SympifyError:
+            QMessageBox.critical(self, "Input Error", "Format persamaan tidak valid.")
+        except Exception as ex:
+            QMessageBox.critical(self, "Error", str(ex))
+
+    def _perform_bisection(self, f, a, b, e, n):
+        """
+        Logika inti dari Metode Biseksi.
+        Fungsi ini hanya melakukan perhitungan, tidak berinteraksi dengan UI.
+        """
+        if f(a) * f(b) > 0:
+            raise ValueError("Tidak ada akar pada selang ini (f(a) * f(b) > 0).")
+
+        data = []
+        i = 1
+        while i <= n:
+            xr = (a + b) / 2.0
+            fa = f(a)
+            fxr = f(xr)
+
+            data.append([i, a, b, fa, f(b), xr, fxr, fxr * fa, abs(b - a)])
