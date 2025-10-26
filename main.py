@@ -92,3 +92,50 @@ class BisectionCalculator(QWidget):
 
     def _connect_signals(self):
         """Menghubungkan sinyal (seperti klik tombol) ke slot (metode)."""
+        self.tombol_hitung.clicked.connect(self._handle_calculation)
+        self.tombol_hapus.clicked.connect(self._clear_table)
+
+    def _apply_styles(self):
+        stylesheet = """
+            QWidget {
+                background-color: #2E3B4E;
+                color: #F0F0F0;
+                font-family: Arial, sans-serif;
+            }
+            QLabel { font-size: 14px; padding-top: 5px; }
+            QLineEdit {
+                background-color: #455364; border: 1px solid #566573;
+                border-radius: 5px; padding: 6px; font-size: 14px;
+            }
+            QPushButton {
+                background-color: #50A8E0; color: white; border: none;
+                border-radius: 5px; padding: 8px 16px;
+                font-size: 14px; font-weight: bold;
+            }
+            QPushButton:hover { background-color: #60B8F0; }
+            #tombol_hapus { background-color: #E74C3C; }
+            #tombol_hapus:hover { background-color: #F75C4C; }
+            QTableWidget {
+                background-color: #455364; gridline-color: #566573;
+                border-radius: 5px; font-size: 13px;
+            }
+            QHeaderView::section {
+                background-color: #566573; color: white; padding: 5px;
+                border: 1px solid #2E3B4E; font-weight: bold;
+            }
+        """
+        self.setStyleSheet(stylesheet)
+
+    # --- Event Handlers and Logic ---
+
+    def _clear_table(self):
+        """Membersihkan isi tabel hasil."""
+        self.table.setRowCount(0)
+
+    def _handle_calculation(self):
+        """
+        Menangani event klik tombol "Hitung".
+        Mengambil input, memvalidasi, memanggil kalkulasi, dan menampilkan hasil.
+        """
+        try:
+            # 1. Mengambil dan memvalidasi input
